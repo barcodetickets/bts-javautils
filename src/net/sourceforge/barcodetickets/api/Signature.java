@@ -10,6 +10,14 @@ import javax.crypto.spec.SecretKeySpec;
 
 import sun.misc.BASE64Encoder;
 
+/**
+ * Produces BTS API request signatures according to the specification as a
+ * reference implementation for API clients built in Java.
+ * 
+ * @license Apache License 2.0
+ * @author Frederick Ding
+ * @version $Id$
+ */
 public class Signature {
 	protected String apiKey;
 
@@ -43,6 +51,7 @@ public class Signature {
 		message.append('\n');
 
 		// process parameters
+		// we use TreeMap because it naturally sorts items by keys
 		StringBuffer parameters = new StringBuffer();
 		Set<Entry<String, String>> _params = params.entrySet();
 		for (Entry<String, String> parameter : _params) {
