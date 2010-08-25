@@ -4,10 +4,11 @@ package net.sourceforge.barcodetickets.api;
 import org.apache.commons.cli.*;
 
 import java.util.TreeMap;
+import java.net.URLEncoder;
 
 /**
- * Generates a BTS API request signature from the parameters provided upon 
- * launch of this program on the command line, as a debugging tool for 
+ * Generates a BTS API request signature from the parameters provided upon
+ * launch of this program on the command line, as a debugging tool for
  * developers producing API clients.
  * 
  * @license Apache License 2.0
@@ -28,6 +29,8 @@ public class SignatureCmdLine {
 		cliOptions.addOption("uri", true, "requested URI including starting /");
 		cliOptions.addOption("param", true, "a parameter");
 		cliOptions.addOption("key", true, "the API key for the HMAC hash");
+		cliOptions.addOption("urlencode", false,
+				"use URL encode on the signature?");
 		cliOptions.addOption("help", false, "show help");
 
 		// parse the command line arguments
@@ -42,10 +45,17 @@ public class SignatureCmdLine {
 			return;
 		}
 
+		// show help
+		if (cmd.hasOption("help")) {
+			help();
+			return;
+		}
+
 		// required parameters
 		if (!cmd.hasOption("hostname") || !cmd.hasOption("uri")
 				|| !cmd.hasOption("key")) {
-			System.out.println("The hostname, uri and key parameters are required.\n");
+			System.out
+					.println("The hostname, uri and key parameters are required.\n");
 			help();
 			return;
 		}
@@ -61,12 +71,18 @@ public class SignatureCmdLine {
 		Signature sigGen = new Signature(cmd.getOptionValue("key"));
 
 		try {
-			System.out.println(sigGen.generate(
+			String signature = sigGen.generate(
 					cmd.getOptionValue("verb", "GET"),
 					cmd.getOptionValue("hostname"), cmd.getOptionValue("uri"),
-					params));
+					params);
+			if (cmd.hasOption("urlencode")) {
+				System.out.println(URLEncoder.encode(signature, "UTF-8"));
+			} else
+				System.out.println(signature);
 		} catch (Exception e) {
-			System.out.println("An error occurred in the signature generation class: " + e.getMessage());
+			System.out
+					.println("An error occurred in the signature generation class: "
+							+ e.getMessage());
 		}
 
 	}
